@@ -8,13 +8,13 @@ THREEx.addSsLensFlare2DatGui	= function(ssLensFlare, blendPass, datGui){
 	datGui		= datGui || new dat.GUI()
 
 
-	var thresholdShaderUniforms	= ssLensFlare.composer.passes[1].uniforms
-	var blendShaderUniforms		= blendPass.uniforms
-	var featureShaderUniforms	= ssLensFlare.composer.passes[2].uniforms
-	var hBlurShaderUniforms1	= ssLensFlare.composer.passes[3].uniforms
-	var vBlurShaderUniforms1	= ssLensFlare.composer.passes[4].uniforms
-	var hBlurShaderUniforms2	= ssLensFlare.composer.passes[5].uniforms
-	var vBlurShaderUniforms2	= ssLensFlare.composer.passes[6].uniforms
+	var thresholdShaderUniforms	= ssLensFlare.passes[1].uniforms
+	var featureShaderUniforms	= ssLensFlare.passes[2].uniforms
+	var hBlurShaderUniforms1	= ssLensFlare.passes[3].uniforms
+	var vBlurShaderUniforms1	= ssLensFlare.passes[4].uniforms
+	var hBlurShaderUniforms2	= ssLensFlare.passes[5].uniforms
+	var vBlurShaderUniforms2	= ssLensFlare.passes[6].uniforms
+	var blendShaderUniforms		= blendPass.passes[0].uniforms
 	
 	// options
 	var options  = {
@@ -89,14 +89,6 @@ THREEx.addSsLensFlare2DatGui	= function(ssLensFlare, blendPass, datGui){
 	folder.add( options, 'uGhostDispersal', 0, 1)	.listen().onChange( onChange )
 	folder.add( options, 'uHaloWidth', 0, 2)	.listen().onChange( onChange )
 	folder.add( options, 'uDistortion', 0, 200)	.listen().onChange( onChange )
-	// folder.open()
-
-	var folder	= datGui.addFolder('Blend');
-	folder.add( options, 'blendRatio', 0, 1)	.listen().onChange( onChange )
-	folder.add( options, 'artefactScale', 0, 30)	.listen().onChange( onChange )
-	folder.add( options, 'blendLensOnly' )
-	folder.add( options, 'blendDefault' )
-	// folder.open()
 
 	var folder	= datGui.addFolder('Blur');
 	folder.add( options, 'horizontalBlur', 0, 0.01)	.listen().onChange( onChange )
@@ -104,7 +96,10 @@ THREEx.addSsLensFlare2DatGui	= function(ssLensFlare, blendPass, datGui){
 	folder.add( options, 'blurNone' )
 	folder.add( options, 'blurLow' )
 	folder.add( options, 'blurHigh' )
-	// folder.open()
 	
-	// datGui.close()
+	var folder	= datGui.addFolder('Blend');
+	folder.add( options, 'blendRatio', 0, 1)	.listen().onChange( onChange )
+	folder.add( options, 'artefactScale', 0, 50)	.listen().onChange( onChange )
+	folder.add( options, 'blendLensOnly' )
+	folder.add( options, 'blendDefault' )
 }

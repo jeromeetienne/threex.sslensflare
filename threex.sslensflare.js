@@ -10,55 +10,48 @@ var THREEx	= THREEx	|| {}
  * @return {THREEx.SsLensFlare}		the instanced object
  */
 THREEx.SsLensFlare	= function(renderer, colorRenderTarget, lensRenderTarget){
-
-	lensRenderTarget	= lensRenderTarget	|| new THREE.WebGLRenderTarget(colorRenderTarget.width/2, colorRenderTarget.height/2, {
-		minFilter	: THREE.LinearFilter,
-		magFilter	: THREE.LinearFilter,
-		format		: THREE.RGBFormat,
-	});
-	this.lensRenderTarget	= lensRenderTarget
-
-
-	var composer	= new THREE.EffectComposer(renderer, lensRenderTarget)
-	this.composer	= composer
+	var passes	= []
+	this.passes	= passes
 
 	// copy color + downsample
 	var effect	= new THREE.TexturePass(colorRenderTarget)
-	composer.addPass( effect )
+	passes.push(effect)
 
 	// ThresholdShader
 	var effect	= new THREE.ShaderPass(THREEx.SsLensFlare.ThresholdShader)
-	composer.addPass( effect )
+	passes.push(effect)
 	
 	// FeatureGenerationShader
 	var effect	= new THREE.ShaderPass(THREEx.SsLensFlare.FeatureGenerationShader)
 	effect.uniforms['tLensColor' ].value	= THREE.ImageUtils.loadTexture( "../images/lenscolor.png" )
 	effect.uniforms['textureSize' ].value.set(lensRenderTarget.width, lensRenderTarget.height)
-	composer.addPass( effect )
-
+	// composer.addPass( effect )
+	passes.push(effect)
 	
 	// add HorizontalBlur Pass
 	var effect	= new THREE.ShaderPass( THREE.HorizontalBlurShader )
 	effect.uniforms[ 'h' ].value	= 0.002 
-	composer.addPass( effect )
+	passes.push(effect)
 
 	// add VerticalBlur Pass
 	var effect	= new THREE.ShaderPass( THREE.VerticalBlurShader )
 	effect.uniforms[ 'v' ].value	= 0.006
-	composer.addPass( effect )
+	passes.push(effect)
 
 	// add HorizontalBlur Pass
 	var effect	= new THREE.ShaderPass( THREE.HorizontalBlurShader )
 	effect.uniforms[ 'h' ].value	= 0.002 
-	composer.addPass( effect )
+	passes.push(effect)
 
 	// add VerticalBlur Pass
 	var effect	= new THREE.ShaderPass( THREE.VerticalBlurShader )
 	effect.uniforms[ 'v' ].value	= 0.006
-	composer.addPass( effect )
+	passes.push(effect)
 
-	this.render	= function(delta){
-		composer.render(delta)
+	this.addPassesTo	= function(composer){
+		passes.forEach(function(pass){
+			composer.addPass(pass)
+		})
 	}
 }
 

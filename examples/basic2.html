@@ -17,7 +17,7 @@
 <script src='../threex.sslensflare2.js'></script>
 <!-- include for threex.sslensflaredatgui -->
 <script src='vendor/three.js/examples/js/libs/dat.gui.min.js'></script>
-<script src='../threex.sslensflaredatgui2.js'></script>
+<script src='../threex.sslensflaredatgui.js'></script>
 <!-- include for body -->
 <body style='margin: 0px; background-color: #000000; overflow: hidden;'><script>
 	var renderer	= new THREE.WebGLRenderer()
@@ -29,6 +29,7 @@
 	var scene	= new THREE.Scene()
 	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000)
 	camera.position.z = 4
+
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		add skymap							//
@@ -91,7 +92,7 @@
 	//		render ssLensFlare						//
 	//////////////////////////////////////////////////////////////////////////////////
 
-	var ssLensFlare	= new THREEx.SsLensFlare(renderer, colorRenderTarget, lensRenderTarget)
+	var ssLensFlare	= new THREEx.SsLensFlare.Passes(renderer, colorRenderTarget, lensRenderTarget)
 	ssLensFlare.addPassesTo(composerLens)
 	//////////////////////////////////////////////////////////////////////////////////
 	//		blend Color with ssLensFlare					//
@@ -111,6 +112,21 @@
 	effect.uniforms['tLensStar'].value	= THREE.ImageUtils.loadTexture('../images/lensstar.png')
 	effect.uniforms['tLensColor'].value	= lensRenderTarget
 	composerBlend.addPass(effect)
+
+/**
+ * make the tLensStar move based on camera rotation
+ */
+updateFcts.push(function(){
+	// compute the angle based on camera rotation
+	var angle	= (camera.rotation.y + camera.rotation.z)*6
+	// compute each matrix
+	var scaleBias1	= new THREE.Matrix4().makeTranslation(-0.5, -0.5, 0)
+	var rotation	= new THREE.Matrix4().makeRotationZ(angle)
+	var scaleBias2	= new THREE.Matrix4().makeTranslation(+0.5, +0.5, 0)
+	// build lensStarMatrix
+	var lensStarMatrix	= effect.uniforms['tLensStarMatrix'].value
+	lensStarMatrix.copy(scaleBias2).multiply(rotation).multiply(scaleBias1)
+})
 
 	// add a dat.gui
 	new THREEx.addSsLensFlare2DatGui(ssLensFlare, effect)
