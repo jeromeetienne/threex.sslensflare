@@ -136,7 +136,7 @@ THREEx.SsLensFlare.ThresholdShader = {
 //		comment								//
 //////////////////////////////////////////////////////////////////////////////////
 
-THREEx.SsLensFlare.FeatureGenerationShader	= {
+THREEx.SsLensFlare.FeatureGenerationShader	= { 
 	uniforms: {
 		tDiffuse	: { type : 't'	, value	: null	},
 		tLensColor	: { type : 't'	, value	: null	},
