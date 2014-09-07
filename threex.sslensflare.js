@@ -251,4 +251,3 @@ THREEx.SsLensFlare.BlendShader = {
 		'}'
 	].join('\n')
 };
-¡
