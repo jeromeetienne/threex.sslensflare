@@ -128,7 +128,7 @@ THREEx.SsLensFlare.FeatureGenerationShader	= {
 		'}'
 	].join('\n'),
 	fragmentShader: [
-		'#define MAX_GHOSTS 8',
+		'#define MAX_GHOSTS 4',
 		
 		'uniform sampler2D tDiffuse;',
 		'uniform sampler2D tLensColor;',
