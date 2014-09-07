@@ -20,6 +20,8 @@
 <script src='../threex.sslensflaredatgui.js'></script>
 <!-- include for body -->
 <body style='margin: 0px; background-color: #000000; overflow: hidden;'><script>
+;(function(){
+
 	var renderer	= new THREE.WebGLRenderer()
 	renderer.setSize( window.innerWidth, window.innerHeight )
 	document.body.appendChild( renderer.domElement )
@@ -29,6 +31,7 @@
 	var scene	= new THREE.Scene()
 	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000)
 	camera.position.z = 4
+
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		add skymap							//
@@ -42,12 +45,10 @@
 	//		Camera Controls							//
 	//////////////////////////////////////////////////////////////////////////////////
 	var mouse	= {x : 0, y : 0}
-	var controlsShift	= false
+	var controlsEnabled	= true
 	document.addEventListener('mousemove', function(event){
-		// first time the shift key is pressed, it enabled the 'non free' mode
-		// after that, shift key MUST be pressed to make the controls move
-		if(controlsShift && event.shiftKey === false) return
-		controlsShift	= controlsShift	|| event.shiftKey
+		// honor controlsEnabled
+		if(controlsEnabled === false) return
 	
 		mouse.x	= (event.clientX / window.innerWidth ) - 0.5
 		mouse.y	= (event.clientY / window.innerHeight) - 0.5
@@ -57,6 +58,10 @@
 		camera.position.y += (mouse.y*5 - camera.position.y) * (delta*3)
 		camera.lookAt( scene.position )
 	})
+
+	renderer.domElement.addEventListener('click', function(event){
+		controlsEnabled	= controlsEnabled === true ? false : true
+	}, false)
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		render Color							//
@@ -87,34 +92,28 @@
 	updateFcts.push(function(delta, now){
 		composerLens.render(delta);
 	})	
+
 	//////////////////////////////////////////////////////////////////////////////////
 	//		render ssLensFlare						//
 	//////////////////////////////////////////////////////////////////////////////////
-
-	var ssLensFlare	= new THREEx.SsLensFlare(renderer, colorRenderTarget, lensRenderTarget)
+	var ssLensFlare	= new THREEx.SsLensFlare.Passes(renderer, colorRenderTarget, lensRenderTarget)
 	ssLensFlare.addPassesTo(composerLens)
+
 	//////////////////////////////////////////////////////////////////////////////////
 	//		blend Color with ssLensFlare					//
 	//////////////////////////////////////////////////////////////////////////////////
-	
 	var composerBlend	= new THREE.EffectComposer(renderer);
 
 	// add Texture Pass
 	var effect	= new THREE.TexturePass(colorRenderTarget);
 	composerBlend.addPass( effect );
 
-	// add blend with lensRenderTarget 
-	// + a full-resolution texture of lens dirt
-	// + full resolution of lens startdust
-	var effect	= new THREE.ShaderPass(THREEx.SsLensFlare.BlendShader)
-	effect.uniforms['tLensDirt'].value	= THREE.ImageUtils.loadTexture('../images/lensdirt.png')
-	effect.uniforms['tLensStar'].value	= THREE.ImageUtils.loadTexture('../images/lensstar.png')
-	effect.uniforms['tLensColor'].value	= lensRenderTarget
-	composerBlend.addPass(effect)
-
-	// add a dat.gui
-	new THREEx.addSsLensFlare2DatGui(ssLensFlare, effect)
-
+	// special blend which make lensStar rotate based on camera rotation
+	var blendPass	= new THREEx.SsLensFlare.BlendPass(lensRenderTarget)
+	blendPass.addPassesTo(composerBlend)
+	updateFcts.push(function(){
+		blendPass.update(camera)
+	})
 
 	// mark the last pass as ```renderToScreen```
 	composerBlend.passes[composerBlend.passes.length-1].renderToScreen	= true;
@@ -122,6 +121,13 @@
 	updateFcts.push(function(delta, now){
 		composerBlend.render(delta);
 	})	
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Dat.GUI
+	//////////////////////////////////////////////////////////////////////////////////
+
+	// add a dat.gui
+	new THREEx.addSsLensFlare2DatGui(ssLensFlare, blendPass)
 
 
 	//////////////////////////////////////////////////////////////////////////////////
@@ -140,4 +146,6 @@
 			updateFn(deltaMsec/1000, nowMsec/1000)
 		})
 	})
+})()
+
 </script></body>
