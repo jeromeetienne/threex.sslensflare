@@ -44,7 +44,7 @@ THREEx.SsLensFlare	= function(renderer, colorRenderTarget, lensRenderTarget){
 
 	// add VerticalBlur Pass
 	var effect	= new THREE.ShaderPass( THREE.VerticalBlurShader )
-	effect.uniforms[ 'v' ].value	= 0.006
+	effect.uniforms[ 'v' ].value	= 0.002
 	composer.addPass( effect )
 
 	// add HorizontalBlur Pass
@@ -54,7 +54,7 @@ THREEx.SsLensFlare	= function(renderer, colorRenderTarget, lensRenderTarget){
 
 	// add VerticalBlur Pass
 	var effect	= new THREE.ShaderPass( THREE.VerticalBlurShader )
-	effect.uniforms[ 'v' ].value	= 0.006
+	effect.uniforms[ 'v' ].value	= 0.002
 	composer.addPass( effect )
 
 	this.render	= function(delta){
@@ -115,9 +115,9 @@ THREEx.SsLensFlare.FeatureGenerationShader	= {
 			value	: new THREE.Vector2(window.innerWidth, window.innerHeight)
 		},
 		//uGhosts		: { type : 'i'	, value	: 8	},
-		uGhostDispersal	: { type : 'f'	, value	: 1/5	},
+		uGhostDispersal	: { type : 'f'	, value	: 0.8	},
 		uHaloWidth	: { type : 'f'	, value	: 0.5	},
-		uDistortion	: { type : 'f'	, value	: 10	},
+		uDistortion	: { type : 'f'	, value	: 7	},
 	},
 	vertexShader	: [
 		'varying vec2 vUv;',
@@ -209,7 +209,7 @@ THREEx.SsLensFlare.FeatureGenerationShader	= {
 
 THREEx.SsLensFlare.BlendShader = {
 	uniforms: {
-		artefactScale	: { type : 'f'	, value	: 4 },
+		artefactScale	: { type : 'f'	, value	: 6 },
 		mixRatio	: { type : "f"  , value : 0.5 },
 		opacity		: { type : "f"  , value : 2.0 },
 		tDiffuse	: { type : 't'	, value	: null },
@@ -251,3 +251,4 @@ THREEx.SsLensFlare.BlendShader = {
 		'}'
 	].join('\n')
 };
+¡
