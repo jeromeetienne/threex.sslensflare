@@ -175,8 +175,8 @@ THREEx.SsLensFlare.FeatureGenerationShader	= {
 		'vec4 textureDistorted(',
 		'	in sampler2D	texture,',
 		'	in vec2		uv,',
-		'	in vec2		direction,',
-		'	in vec3		distortion ',
+		'	in vec2		direction,',	// direction of distortion
+		'	in vec3		distortion ',	// per-channel distortion factor
 		') {',
 		'	return vec4(',
 		'		texture2D(texture, uv + direction * distortion.r).r,',
@@ -195,7 +195,6 @@ THREEx.SsLensFlare.FeatureGenerationShader	= {
 
 			///////////////////////////////////////////////////
 			//	sample ghosts:
-			'vec4 result = vec4(0.0);',
 			'for(int i = 0; i < MAX_GHOSTS; ++i){',
 				// offset of the ghosts
 			'	vec2 offset	= fract(texcoord + ghostVec * float(i));',
@@ -213,7 +212,7 @@ THREEx.SsLensFlare.FeatureGenerationShader	= {
 			'gl_FragColor		*= texture2D(tLensColor, uvLensColor);',
 			
 			///////////////////////////////////////////////////
-			//	sample halo:
+			// sample halo:
 
 			'vec2 texelSize = 1.0 / textureSize;',
 			'vec2 haloVec	= normalize(ghostVec) * uHaloWidth;',
@@ -265,14 +264,12 @@ THREEx.SsLensFlare.BlendShader = {
 		'uniform sampler2D tLensStar;',
 		'uniform mat4      tLensStarMatrix;',
 
-		'uniform float	artefactScale;',
-		'uniform float	artefact;',
+		'varying vec2	vUv;',
 
+		'uniform float	artefactScale;',
 
 		"uniform float	opacity;",
 		"uniform float	mixRatio;",
-
-		'varying vec2	vUv;',
 		
 		'void main() {',
 			// compute artefactColor
